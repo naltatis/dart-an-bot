@@ -9,7 +9,9 @@ main() {
     List matches = data['matchdata'];
     List team1Gaols = matches.map((match) => Math.parseInt(match['points_team1']));
     List team2Gaols = matches.map((match) => Math.parseInt(match['points_team2']));
-    print(avgGoals(team1Gaols, 2).toStringAsFixed(0) + ":" + avgGoals(team2Gaols, 2).toStringAsFixed(0));
+    var resultTeam1 = avgGoals(team1Gaols, 2).toStringAsFixed(0);
+    var resultTeam2 = avgGoals(team2Gaols, 2).toStringAsFixed(0);
+    print("$resultTeam1:$resultTeam2");
   });
 }
 
@@ -18,7 +20,7 @@ double avgGoals(List goals, int weight) {
   goals = goals.filter((g) => (g >= 0));
   goals.forEach((int gaol) {
     if (result == null) {
-      result = gaol;
+      result = gaol * 1.0;
     } else {
       result = (result + gaol * weight) / (weight + 1);
     }
