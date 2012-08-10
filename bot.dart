@@ -5,7 +5,7 @@
 main() {
   var uri = teamsUri(100,134);
   var result = getJson(uri);
-  result.then((data) {
+  result.then((Map data) {
     List matches = data['matchdata'];
     List team1Gaols = matches.map((match) => Math.parseInt(match['points_team1']));
     List team2Gaols = matches.map((match) => Math.parseInt(match['points_team2']));
@@ -17,7 +17,10 @@ main() {
 
 double avgGoals(List goals, int weight) {
   double result = null;
+  
+  // remove invalid values
   goals = goals.filter((g) => (g >= 0));
+
   goals.forEach((int gaol) {
     if (result == null) {
       result = gaol * 1.0;
