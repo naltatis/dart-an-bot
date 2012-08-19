@@ -1,59 +1,30 @@
-#import('dart:io');
-#import('dart:uri');
-#import('dart:json');
+#import("openliga.dart");
+#import("predictor.dart");
+
+var ol, predictor;
 
 main() {
-  var uri = teamsUri(100,134);
-  var result = getJson(uri);
-  result.then((Map data) {
-    List matches = data['matchdata'];
-    List team1Gaols = matches.map((match) => Math.parseInt(match['points_team1']));
-    List team2Gaols = matches.map((match) => Math.parseInt(match['points_team2']));
-    var resultTeam1 = avgGoals(team1Gaols, 2).toStringAsFixed(0);
-    var resultTeam2 = avgGoals(team2Gaols, 2).toStringAsFixed(0);
-    print("$resultTeam1:$resultTeam2");
+  ol = new OpenLiga();
+  predictor = new Predictor(2.6);
+
+  ol.getCurrentMatches().then((Map data) {
+    data["matchdata"].forEach((Map game) {
+      predictGame(game);
+    });
   });
 }
 
-double avgGoals(List goals, int weight) {
-  double result = null;
-  
-  // remove invalid values
-  goals = goals.filter((g) => (g >= 0));
+void predictGame(Map game) {
+  var nameTeam1 = game["name_team1"];
+  var nameTeam2 = game["name_team2"];
 
-  goals.forEach((int gaol) {
-    if (result == null) {
-      result = gaol * 1.0;
-    } else {
-      result = (result + gaol * weight) / (weight + 1);
-    }
+  ol.getTeamResults(game["id_team1"], game["id_team2"]).then((List resutls) {
+
+    List<num> team1Goals = resutls.map((result) => result[0]);
+    List<num> team2Goals = resutls.map((result) => result[1]);
+
+    String result = predictor.predict(team1Goals, team2Goals);
+
+    print("$result >> $nameTeam1 vs. $nameTeam2");
   });
-  return result;
-}
-
-Future<Object> getJson(Uri uri) {
-  var completer = new Completer();
-  var client = new HttpClient();
-  var conn = client.getUrl(uri);
-  conn.onRequest = (HttpClientRequest request) {
-    request.outputStream.close();
-  };
-  conn.onResponse = (HttpClientResponse response) {
-    final StringInputStream input = new StringInputStream(response.inputStream);
-    StringBuffer buffer = new StringBuffer('');
-
-    input.onData = () {
-      buffer.add(input.read());
-    };
-
-    input.onClosed = () {
-      completer.complete(JSON.parse(buffer.toString()));
-      client.shutdown();
-    };
-  };  
-  return completer.future;
-}
-
-Uri teamsUri(int team1, int team2) {
-  return new Uri.fromString("http://openligadb-json.heroku.com/api/matchdata_by_teams?team_id_1=$team1&team_id_2=$team2");
 }
