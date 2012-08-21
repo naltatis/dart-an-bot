@@ -23,7 +23,7 @@ class OpenLiga {
       data['matchdata'].forEach((Map game) {
         var gameResult = [Math.parseInt(game["points_team1"]), Math.parseInt(game["points_team2"])];
 
-        if (gameResult[0] < 0 || gameResult[1] < 0 || game["league_shortcut"] != "bl1") {
+        if (gameResult[0] < 0 || gameResult[1] < 0) {
           return;
         }
 
