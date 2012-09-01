@@ -13,7 +13,7 @@ class Botliga {
 
   Future<int> guess(String matchId, String result) {
     var url = "$domain";
-    var data = "result=$result&match_id$matchId&token=$token";
+    var data = "result=$result&match_id=$matchId&token=$token";
     return rest.post(url, data);
   }
 }

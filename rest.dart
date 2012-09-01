@@ -4,21 +4,23 @@
 #import('dart:json');
 
 class Rest {
+  var client = new HttpClient();
 
   Future<String> get(String url) {
-    //print(">> "+url);
+    //print(">> ".concat(url));
     var completer = new Completer();
-    var client = new HttpClient();
     var conn = client.getUrl(new Uri.fromString(url));
     conn.onRequest = (HttpClientRequest request) {
       request.outputStream.close();
     };
     conn.onResponse = (HttpClientResponse response) {
-      final StringInputStream input = new StringInputStream(response.inputStream);
-      StringBuffer buffer = new StringBuffer('');
+      print("<< ".concat(url));
+      StringInputStream input = new StringInputStream(response.inputStream);
+      StringBuffer buffer = new StringBuffer("");
 
       input.onData = () {
-        buffer.add(input.read());
+        String currentString = input.read();
+        buffer.add(currentString);          
       };
 
       input.onClosed = () {
@@ -30,14 +32,14 @@ class Rest {
   }
 
   Future<String> post(String url, String data) {
-    //print(">> " + url +  "?" + data);
+    //print(">> $url?$data");
     var completer = new Completer();
-    var client = new HttpClient();
     var conn = client.postUrl(new Uri.fromString(url));
     conn.onRequest = (HttpClientRequest request) {
       request.headers.set(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
-      request.contentLength = data.length;
-      request.outputStream.writeString(data);
+      var encodedData = encodeUri(data);
+      request.contentLength = encodedData.length;
+      request.outputStream.writeString(encodedData);
       request.outputStream.close();
     };
     conn.onResponse = (HttpClientResponse response) {
