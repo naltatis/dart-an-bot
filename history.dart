@@ -1,5 +1,6 @@
 #library("history");
 #import('dart:io');
+#import('dart:math');
 
 class History {
   Map<String, List<Result>> repo = new HashMap<String, List<Result>>();
@@ -92,15 +93,15 @@ class Match {
     dateString = parts[1];
     hostName = parts[2];
     guestName = parts[3];
-    hostGoals = Math.parseInt(parts[4]);
-    guestGoals = Math.parseInt(parts[5]);
+    hostGoals = parseInt(parts[4]);
+    guestGoals = parseInt(parts[5]);
   }
 
   set dateString(String string) {
     List<String> parts = string.split("/");
-    int year = Math.parseInt(parts[2]);
-    int month = Math.parseInt(parts[1]);
-    int day = Math.parseInt(parts[0]);
-    date = new Date(year, month, day);        
+    int year = parseInt(parts[2]);
+    int month = parseInt(parts[1]);
+    int day = parseInt(parts[0]);
+    date = new Date(year, month, day);
   }
 }
